@@ -8,6 +8,12 @@ import cors from 'cors';
 import express from 'express';
 const app = express();
 
+import  { Configuration, OpenAIApi } from 'openai';
+const configuration = new Configuration({
+  apiKey: "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"
+});
+const openai = new OpenAIApi(configuration);
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
@@ -23,8 +29,23 @@ app.post('/', async (req, res) => {
   if (question) {
     const response = await api.sendMessage(question)
     res.status(200).send(response.text)
+  } else {
+    const response = await api.sendMessage("No question, just kidding!")
+    res.status(200).send(response.text)
   }
 
+})
+
+app.get('/imagegenerator', async (req, res) => {
+  const response = await openai.createImage({
+    prompt: "Four black geese",
+    n: 1,
+    size: "1024x1024",
+  });
+
+  const imageUrl = response.data.data[0].url;
+
+  console.log(imageUrl);
 })
 
 app.listen(3466, () => console.log('App listening on 3466'));
